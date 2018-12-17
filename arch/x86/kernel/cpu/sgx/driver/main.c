@@ -103,7 +103,7 @@ static const struct file_operations sgx_encl_fops = {
 	.get_unmapped_area	= sgx_get_unmapped_area,
 };
 
-static const struct file_operations sgx_provision_fops = {
+const struct file_operations sgx_provision_fops = {
 	.owner			= THIS_MODULE,
 };
 
@@ -261,7 +261,15 @@ static int sgx_dev_init(struct device *parent)
 	if (ret)
 		goto err_encl_dev_add;
 
+	ret = cdev_device_add(&sgx_dev->provision_cdev,
+			      &sgx_dev->provision_dev);
+	if (ret)
+		goto err_provision_dev_add;
+
 	return 0;
+
+err_provision_dev_add:
+	cdev_device_del(&sgx_dev->encl_cdev, &sgx_dev->encl_dev);
 
 err_encl_dev_add:
 	destroy_workqueue(sgx_encl_wq);
@@ -289,6 +297,7 @@ static int sgx_drv_remove(struct platform_device *pdev)
 	struct sgx_dev_ctx *ctx = dev_get_drvdata(&pdev->dev);
 
 	cdev_device_del(&ctx->encl_cdev, &ctx->encl_dev);
+	cdev_device_del(&ctx->provision_cdev, &ctx->provision_dev);
 	destroy_workqueue(sgx_encl_wq);
 
 	return 0;
