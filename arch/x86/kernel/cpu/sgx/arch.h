@@ -110,6 +110,7 @@ enum sgx_attribute {
 				  GENMASK_ULL(63, 8),
 	SGX_ATTR_ALLOWED_MASK	= SGX_ATTR_DEBUG |
 				  SGX_ATTR_MODE64BIT |
+				  SGX_ATTR_PROVISIONKEY |
 				  SGX_ATTR_KSS,
 };
 
